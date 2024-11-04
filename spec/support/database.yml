@@ -1,0 +1,6 @@
+test:
+  adapter: postgresql
+  database: pg_aggregates_test
+  username: <%= ENV.fetch("POSTGRES_USER", "postgres") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD", "postgres") %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>

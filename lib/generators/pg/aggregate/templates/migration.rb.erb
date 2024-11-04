@@ -1,0 +1,5 @@
+class CreateAggregate<%= @aggregate_name.camelize %> < ActiveRecord::Migration<%= @migration_version %>
+  def change
+    create_aggregate "<%= @aggregate_name %>", version: <%= @version %>
+  end
+end

@@ -1,0 +1,13 @@
+CREATE AGGREGATE <%= @aggregate_name %>(
+  -- Specify your input type(s)
+  anyelement
+) (
+  -- State function - called for each input value
+  sfunc = array_append,
+  
+  -- State data type
+  stype = anyarray,
+  
+  -- Initial state value
+  initcond = '{}'
+);

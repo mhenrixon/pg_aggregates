@@ -1,0 +1,79 @@
+inherit_gem:
+  rubocop-mhenrixon:
+    - config/default.yml
+
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.0
+  NewCops: enable
+  Exclude: 
+    - lib/generators/**/*
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+  
+RSpec/ContextWording:
+  Enabled: true
+  Prefixes:
+    - and
+    - as
+    - for
+    - if
+    - in
+    - or
+    - unless
+    - when
+    - with
+    - without
+
+RSpec/EmptyExampleGroup:
+  Enabled: true
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/ExpectChange:
+  Enabled: false
+  EnforcedStyle: block
+
+RSpec/InstanceVariable:
+  Enabled: true
+  Exclude:
+    - spec/system/**/*
+
+RSpec/LetSetup:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/PendingWithoutReason:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
