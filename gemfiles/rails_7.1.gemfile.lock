@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    pg_aggregates (0.1.0)
+    pg_aggregates (0.1.1)
       activerecord (>= 6.1)
       pg (>= 1.1)
       railties (>= 6.1)
@@ -69,6 +69,7 @@ GEM
     diff-lcs (1.5.1)
     drb (2.2.1)
     erubi (1.13.0)
+    gem-release (2.2.2)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     io-console (0.7.2)
@@ -206,6 +207,7 @@ DEPENDENCIES
   bigdecimal
   database_cleaner
   drb
+  gem-release
   logger
   mutex_m
   pg_aggregates!
