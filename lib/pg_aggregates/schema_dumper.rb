@@ -3,11 +3,11 @@
 module PgAggregates
   module SchemaDumper
     def tables(stream)
+      super
+
       # First dump aggregates
       dump_custom_aggregates(stream)
       stream.puts
-
-      super
     end
 
     private
