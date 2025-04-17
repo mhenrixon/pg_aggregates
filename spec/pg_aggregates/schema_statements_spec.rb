@@ -109,7 +109,17 @@ RSpec.describe PgAggregates::SchemaStatements do
         connection.drop_aggregate("sum2", "int4", force: true)
       end.not_to raise_error
 
-      expect(connection.select_value("SELECT to_regclass('test_view')")).to be_nil
+      # Check if view exists using a more compatible approach
+      view_exists = connection.select_value(<<~SQL)
+        SELECT EXISTS (
+          SELECT 1 FROM pg_catalog.pg_class c
+          JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+          WHERE c.relname = 'test_view'
+          AND n.nspname = 'public'
+          AND c.relkind = 'v'
+        )
+      SQL
+      expect(view_exists).to be false
     end
   end
 end

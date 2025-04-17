@@ -2,10 +2,10 @@
 
 # spec/spec_helper.rb
 require "bundler/setup"
+require "logger"
 require "active_record"
 require "pg_aggregates"
 require "database_cleaner"
-require "logger"
 require "pathname"
 
 # Set up a fake Rails.root
@@ -133,13 +133,23 @@ RSpec.configure do |config|
     end
   end
 
-  # Add a helper to create the array_append function
+  # Add helper functions needed for tests
   config.before do
     ActiveRecord::Base.connection.execute(<<~SQL)
       CREATE OR REPLACE FUNCTION array_append(anyarray, anyelement)
       RETURNS anyarray AS $$
       BEGIN
         RETURN array_cat($1, ARRAY[$2]);
+      END;
+      $$ LANGUAGE plpgsql IMMUTABLE;
+    SQL
+    
+    # Add int4pl function for aggregate tests
+    ActiveRecord::Base.connection.execute(<<~SQL)
+      CREATE OR REPLACE FUNCTION int4pl(integer, integer)
+      RETURNS integer AS $$
+      BEGIN
+        RETURN $1 + $2;
       END;
       $$ LANGUAGE plpgsql IMMUTABLE;
     SQL

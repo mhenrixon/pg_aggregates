@@ -184,7 +184,7 @@ DEPENDENCIES
   database_cleaner
   drb
   gem-release
-  logger
+  logger (>= 1.5.0)
   mutex_m
   pg_aggregates!
   railties (~> 6.1.0)
