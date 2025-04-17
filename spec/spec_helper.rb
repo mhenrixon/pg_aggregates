@@ -11,7 +11,7 @@ require "pathname"
 # Set up a fake Rails.root
 module Rails
   def self.root
-    @root ||= Pathname.new(File.expand_path("dummy", __dir__)) # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
+    @root ||= Pathname.new(File.expand_path("dummy", __dir__))
   end
 end
 
@@ -31,11 +31,20 @@ module VersionHelper
   def dump_schema
     stream = StringIO.new
 
-    # Use the public interface which works across all versions
-    ActiveRecord::SchemaDumper.dump(
-      ActiveRecord::Base.connection,
-      stream
-    )
+    # Handle different ActiveRecord versions
+    if ActiveRecord.version >= Gem::Version.new("8.0.0")
+      # Rails 8.0+ doesn't use with_connection anymore
+      ActiveRecord::SchemaDumper.dump(
+        ActiveRecord::Base.connection_pool,
+        stream
+      )
+    else
+      # Older Rails versions
+      ActiveRecord::SchemaDumper.dump(
+        ActiveRecord::Base.connection,
+        stream
+      )
+    end
 
     stream.string
   end

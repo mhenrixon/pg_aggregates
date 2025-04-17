@@ -2,11 +2,9 @@
 
 module PgAggregates
   class Railtie < Rails::Railtie
-    initializer "postgres_aggregates.load" do
+    initializer "pg_aggregates.load", before: "fx.load" do
       ActiveSupport.on_load(:active_record) do
-        ActiveRecord::ConnectionAdapters::AbstractAdapter.include PgAggregates::SchemaStatements
-        ActiveRecord::Migration::CommandRecorder.include PgAggregates::CommandRecorder
-        ActiveRecord::SchemaDumper.prepend PgAggregates::SchemaDumper
+        PgAggregates.load
       end
     end
   end

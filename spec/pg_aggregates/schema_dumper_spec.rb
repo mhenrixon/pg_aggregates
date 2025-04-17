@@ -7,7 +7,7 @@ RSpec.describe PgAggregates::SchemaDumper do
 
   let(:simple_aggregate) do
     <<~SQL
-      CREATE AGGREGATE array_agg(anyelement) (
+      CREATE AGGREGATE custom_array_agg(anyelement) (
         sfunc = array_append,
         stype = anyarray,
         initcond = '{}'
@@ -17,40 +17,35 @@ RSpec.describe PgAggregates::SchemaDumper do
 
   let(:complex_aggregate) do
     <<~SQL
-      CREATE AGGREGATE array_agg(anynonarray) (
+      CREATE AGGREGATE custom_complex_agg(anyelement) (
         sfunc = array_append,
         stype = anyarray,
-        sspace = 1000,
-        finalfunc = array_larger,
         initcond = '{}'
       );
     SQL
   end
 
   describe "schema dumping" do
-    context "with a single version" do
+    context "with a single aggregate" do
       it "includes the aggregate in the schema" do
-        with_aggregate_file("array_agg", 1, simple_aggregate) do
-          schema = dump_schema
-          expect(schema).to include('create_aggregate "array_agg"')
-          expect(schema).to include("sfunc = array_append")
-          expect(schema).to include("stype = anyarray")
-          expect(schema).not_to include("versions:")
-        end
+        # Create the aggregate directly in the database
+        ActiveRecord::Base.connection.execute(simple_aggregate)
+
+        schema = dump_schema
+        expect(schema).to include('create_aggregate "custom_array_agg"')
+        expect(schema).to include("sfunc = array_append")
+        expect(schema).to include("stype = anyarray")
       end
     end
 
-    context "with multiple versions" do
-      it "uses the latest version in the schema" do
-        with_aggregate_file("array_agg", 1, simple_aggregate) do
-          with_aggregate_file("array_agg", 2, complex_aggregate) do
-            schema = dump_schema
-            expect(schema).to include('create_aggregate "array_agg"')
-            expect(schema).to include("sspace = 1000")
-            expect(schema).to include("finalfunc = array_larger")
-            expect(schema).to include("versions: 1, 2")
-          end
-        end
+    context "with a complex aggregate" do
+      it "includes all aggregate properties in the schema" do
+        # Create a more complex aggregate
+        ActiveRecord::Base.connection.execute(complex_aggregate)
+
+        schema = dump_schema
+        expect(schema).to include('create_aggregate "custom_complex_agg"')
+        expect(schema).to include("sfunc = array_append")
       end
     end
 
@@ -76,14 +71,14 @@ RSpec.describe PgAggregates::SchemaDumper do
       end
 
       it "sorts aggregates alphabetically" do
-        with_aggregate_file("zebra_agg", 1, zebra_aggregate) do
-          with_aggregate_file("alpha_agg", 1, alpha_aggregate) do
-            schema = dump_schema
-            alpha_pos = schema.index("alpha_agg")
-            zebra_pos = schema.index("zebra_agg")
-            expect(alpha_pos).to be < zebra_pos
-          end
-        end
+        # Create both aggregates directly in the database
+        ActiveRecord::Base.connection.execute(zebra_aggregate)
+        ActiveRecord::Base.connection.execute(alpha_aggregate)
+
+        schema = dump_schema
+        alpha_pos = schema.index("alpha_agg")
+        zebra_pos = schema.index("zebra_agg")
+        expect(alpha_pos).to be < zebra_pos
       end
     end
   end

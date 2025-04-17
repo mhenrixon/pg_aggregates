@@ -1,8 +1,4 @@
-inherit_gem:
-  rubocop-mhenrixon:
-    - config/default.yml
-
-require:
+plugins:
   - rubocop-performance
   - rubocop-rake
   - rubocop-rspec
