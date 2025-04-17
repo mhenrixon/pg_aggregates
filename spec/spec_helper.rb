@@ -20,6 +20,10 @@ ActiveRecord::Base.logger = Logger.new($stdout) if ENV["DEBUG"]
 
 # Helper methods for version compatibility
 module VersionHelper
+  def rails_8_or_newer?
+    ActiveRecord.version >= Gem::Version.new("8.0.0")
+  end
+
   def rails_7_or_newer?
     ActiveRecord.version >= Gem::Version.new("7.0.0")
   end
@@ -31,15 +35,25 @@ module VersionHelper
   def dump_schema
     stream = StringIO.new
 
-    # Handle different ActiveRecord versions
-    if ActiveRecord.version >= Gem::Version.new("8.0.0")
-      # Rails 8.0+ doesn't use with_connection anymore
+    # The most reliable approach is to check for method availability rather than version
+    if rails_8_or_newer?
+      # Rails 8.0+ uses connection_pool and with_connection
       ActiveRecord::SchemaDumper.dump(
         ActiveRecord::Base.connection_pool,
         stream
       )
+    elsif ActiveRecord::Base.connection_pool.respond_to?(:create_schema_dumper) # rubocop:disable Lint/DuplicateBranch
+      # Some versions use connection_pool directly and it has create_schema_dumper
+      ActiveRecord::SchemaDumper.dump(
+        ActiveRecord::Base.connection_pool,
+        stream
+      )
+    elsif ActiveRecord::Base.connection.respond_to?(:schema_dumper)
+      # Some versions use schema_dumper instead
+      dumper = ActiveRecord::Base.connection.schema_dumper
+      dumper.dump(stream)
     else
-      # Older Rails versions
+      # Fallback for any other version
       ActiveRecord::SchemaDumper.dump(
         ActiveRecord::Base.connection,
         stream
@@ -75,7 +89,7 @@ end
 def setup_database
   config = {
     adapter: "postgresql",
-    database: ENV.fetch("POSTGRES_DB", "pg_aggregates_test"),
+    database: ENV.fetch("POSTGRES_DB", "pg_test"),
     username: ENV.fetch("POSTGRES_USER", "postgres"),
     password: ENV.fetch("POSTGRES_PASSWORD", "postgres"),
     host: ENV.fetch("POSTGRES_HOST", "localhost")

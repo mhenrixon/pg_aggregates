@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    pg_aggregates (0.2.2)
+    pg_aggregates (0.2.3)
       activerecord (>= 6.1)
       pg (>= 1.1)
       railties (>= 6.1)
