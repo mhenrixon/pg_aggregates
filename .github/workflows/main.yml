@@ -18,9 +18,8 @@ jobs:
           ruby-version: 3.4.3
           bundler-cache: true
       
-      - name: Bundle install
-        run: |
-          bundle install
+      - name: Lint with rubocop
+        run: | 
           bin/rubocop -f github
 
   test:
@@ -53,16 +52,17 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: false
-      
+
       - uses: actions/cache@v4
         with:
           path: vendor/bundle
-          key: bundle-use-ruby-${{ matrix.os }}-${{ matrix.ruby-version }}-${{ hashFiles('**/Gemfile.lock') }}
+          key: bundle-use-ruby-${{ runner.os }}-${{ matrix.ruby }}-rails-${{ matrix.rails }}-${{ hashFiles('**/Gemfile.lock', '**/gemfiles/rails_${{ matrix.rails }}.gemfile.lock') }}
           restore-keys: |
-            bundle-use-ruby-${{ matrix.os }}-${{ matrix.ruby-version }}-
+            bundle-use-ruby-${{ runner.os }}-${{ matrix.ruby }}-rails-${{ matrix.rails }}-
       
-      - name: Bundle install
+      - name: Bundle and Appraisal install
         run: |
+          gem install bundler
           bundle install
           bundle exec appraisal install
       
