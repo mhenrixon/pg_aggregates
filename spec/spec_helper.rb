@@ -143,7 +143,7 @@ RSpec.configure do |config|
       END;
       $$ LANGUAGE plpgsql IMMUTABLE;
     SQL
-    
+
     # Add int4pl function for aggregate tests
     ActiveRecord::Base.connection.execute(<<~SQL)
       CREATE OR REPLACE FUNCTION int4pl(integer, integer)
