@@ -6,8 +6,14 @@ plugins:
 AllCops:
   TargetRubyVersion: 3.0
   NewCops: enable
-  Exclude: 
-    - lib/generators/**/*
+  Exclude:
+    - "bin/**/*"
+    - "db/**/*"
+    - "doc/**/*"
+    - "docs/**/*"
+    - "lib/generators/**/*"
+    - "sig/**/*"
+    - "vendor/**/*"
 
 Metrics/AbcSize:
   Enabled: false
